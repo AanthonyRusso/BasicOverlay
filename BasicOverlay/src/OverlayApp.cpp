@@ -14,7 +14,7 @@ bool OverlayApp::Init()
 	}
 
 	Overlay = VROverlay();
-	EVROverlayError OverlayErr = Overlay->CreateOverlay("com.ashes.my_overlay", "My Overlay", &handle);
+	EVROverlayError OverlayErr = Overlay->CreateOverlay("com.anton.my_overlay", "My Overlay", &handle);
 
 	if (OverlayErr != VROverlayError_None) {
 		return false;
