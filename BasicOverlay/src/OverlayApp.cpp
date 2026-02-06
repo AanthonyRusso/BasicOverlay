@@ -2,17 +2,20 @@
 #include <windows.h>
 #include <cstdio>
 #include <openvr.h>
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Media.Control.h>
 #include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <chrono>
+#include <thread>
+#include <atomic>
 
 using namespace vr;
 
 bool OverlayApp::Init()
 {
 
-	winrt::init_apartment(winrt::apartment_type::multi_threaded);
+
+	std::system("python \"src\\getname.py\"");
 
 	vr::EVRInitError VRIniterr = VRInitError_None;
 	VRSystem = VR_Init(&VRIniterr, VRApplication_Overlay);
@@ -21,12 +24,15 @@ bool OverlayApp::Init()
 		return false;
 	}
 
+	printf("VR Initialized \n");
+
 	Overlay = VROverlay();
 	EVROverlayError OverlayErr = Overlay->CreateOverlay("com.anton.my_overlay", "My Overlay", &handle);
 
 	if (OverlayErr != VROverlayError_None) {
 		return false;
 	}
+	printf("Overlay Intialized \n");
 
 	Overlay->SetOverlayWidthInMeters(handle, .5);
 
@@ -41,17 +47,17 @@ bool OverlayApp::Init()
 	Overlay->SetOverlayAlpha(handle, .2f);
 	Overlay->SetOverlayColor(handle, 1.0f, 1.0f, 1.0f);
 
-
 	char cwd[MAX_PATH];
 	GetCurrentDirectoryA(MAX_PATH, cwd);
-	printf("CWD: %s\n", cwd);
-	char FullPath[MAX_PATH];
-	snprintf(FullPath, MAX_PATH, "%s\\Assets\\whitebackground.png", cwd);
+	snprintf(CoverPath, MAX_PATH, "%s\\ChangingAssets\\cover.jpg", cwd);
 
-	Overlay->SetOverlayFromFile(handle, FullPath);
+	snprintf(TitlePath, MAX_PATH, "%s\\ChangingAssets\\now_playing.txt", cwd);
+
+	Overlay->SetOverlayFromFile(handle, CoverPath);
 
 	Overlay->ShowOverlay(handle);
 
+	
 	
 
 	
@@ -104,4 +110,43 @@ bool OverlayApp::UpdateOverlayPosition(float DistanceMeters)
 	}
 
 	return true;
+}
+
+
+
+void OverlayApp::UpdateNowPlaying()
+{
+	static auto next = std::chrono::steady_clock::now();
+
+	if (std::chrono::steady_clock::now() < next)
+	{
+		return;
+	}
+	next = std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
+	std::thread([]()
+		{
+			std::system("python \"src\\getname.py\"");
+		}).detach();
+
+	std::wifstream  file(TitlePath);
+	if (!file.is_open()) 
+	{
+		return;
+	}
+
+	OldPlaying.artist = CurrentPlaying.artist;
+	OldPlaying.title = CurrentPlaying.title;
+
+	std::getline(file, CurrentPlaying.title);
+	std::getline(file, CurrentPlaying.artist);
+
+	if (OldPlaying.artist != CurrentPlaying.artist and OldPlaying.title != CurrentPlaying.title)
+	{
+		wprintf(L"TITLE : [%ls]\n", CurrentPlaying.title.c_str());
+		wprintf(L"ARTIST: [%ls]\n", CurrentPlaying.artist.c_str());
+		Overlay->SetOverlayFromFile(handle, CoverPath);
+	}	
+
+
+
 }

@@ -16,8 +16,6 @@ int main() {
 		return 1;
 	}
 
-	std::printf("Overlay running :D");
-
 
 	bool MoveOverlaySuccess;
 
