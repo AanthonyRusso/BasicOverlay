@@ -1,11 +1,19 @@
 #include "OverlayApp.h"
 #include <windows.h>
+#include <cstdio>
 #include <openvr.h>
+#include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Media.Control.h>
+#include <iostream>
 
 using namespace vr;
 
 bool OverlayApp::Init()
 {
+
+	winrt::init_apartment(winrt::apartment_type::multi_threaded);
+
 	vr::EVRInitError VRIniterr = VRInitError_None;
 	VRSystem = VR_Init(&VRIniterr, VRApplication_Overlay);
 
@@ -44,6 +52,9 @@ bool OverlayApp::Init()
 
 	Overlay->ShowOverlay(handle);
 
+	
+
+	
 
 	return true;
 

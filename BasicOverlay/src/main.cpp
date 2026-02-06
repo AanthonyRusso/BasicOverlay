@@ -23,7 +23,7 @@ int main() {
 
 	while (true) {
 		MoveOverlaySuccess = app.UpdateOverlayPosition(0.5f);
-
+		app.UpdateNowPlaying();
 		std::this_thread::sleep_for(std::chrono::milliseconds(8));
 	}
 
