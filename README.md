@@ -2,4 +2,9 @@
 Basic Overlay for SteamVR
 
 # Depedencies
-No depedencies at this time
+
+## Run these commands for the python script
+```
+pip install winrt.windows.media.control
+pip install winrt.windows.storage.streams
+```
